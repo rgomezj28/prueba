@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SGI</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="chart.umd.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-block">
+      <span class="brand-mark">SGI</span>
+      <div>
+        <h1>SGI - Suite de Gestión Integral</h1>
+      </div>
+    </div>
+    <div class="session-box">
+      <span id="userBadge" class="user-badge">Sin sesión</span>
+      <button id="logoutButton" class="secondary" type="button">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-heading">
+        <span class="eyebrow">Menú</span>
+        <h2>Navegación</h2>
+      </div>
+      <nav id="moduleMenu" class="menu-list"></nav>
+      <div class="sidebar-note">
+        <strong>Sistema SGI</strong>
+        <p>Gestión integral, operaciones y reportes.</p>
+      </div>
+    </aside>
+
+    <section class="content">
+      <section id="dashboardSection" class="dashboard-grid">
+        <div class="dashboard-header">
+          <h2>Dashboard Ejecutivo</h2>
+          <p id="dashboardWelcome">Resumen de indicadores, actividad reciente, prioridades y respaldo del sistema.</p>
+        </div>
+
+        <div class="kpi-grid">
+          <article class="kpi-card primary">
+            <span class="kpi-label">Registros Totales</span>
+            <strong id="dashboardTotalRecords" class="kpi-value">0</strong>
+            <span class="kpi-meta">Visibles en módulos</span>
+          </article>
+          <article class="kpi-card accent">
+            <span class="kpi-label">Tareas Pendientes</span>
+            <strong id="dashboardPendingItems" class="kpi-value">0</strong>
+            <span class="kpi-meta">Por revisar</span>
+          </article>
+          <article class="kpi-card success">
+            <span class="kpi-label">Cobertura Operativa</span>
+            <strong id="dashboardCoverage" class="kpi-value">0%</strong>
+            <span class="kpi-meta">Módulos con datos</span>
+          </article>
+          <article class="kpi-card info">
+            <span class="kpi-label">Último Respaldo</span>
+            <strong id="dashboardBackupLast" class="kpi-meta-text">Sin respaldo</strong>
+          </article>
+        </div>
+
+        <div class="dashboard-insights">
+          <article class="insight-card">
+            <span class="insight-icon">⚠</span>
+            <div>
+              <span class="insight-label">Estado del Seguimiento</span>
+              <strong id="heroFocus">0 alertas</strong>
+            </div>
+          </article>
+          <article class="insight-card">
+            <span class="insight-icon">📊</span>
+            <div>
+              <span class="insight-label">Último Movimiento</span>
+              <strong id="heroLastMovement" class="insight-value">Sin actividad</strong>
+            </div>
+          </article>
+        </div>
+
+        <div class="dashboard-row">
+          <div class="panel analytics-panel">
+            <div class="panel-header">
+              <h3>Resumen por Módulo</h3>
+              <span class="info-chip">Indicadores en tiempo real</span>
+            </div>
+            <div id="dashboardModuleCards" class="module-summary-grid"></div>
+          </div>
+        </div>
+
+        <div class="dashboard-row two-column">
+          <div class="panel analytics-panel">
+            <div class="panel-header">
+              <h3>Distribución de Registros</h3>
+              <span class="info-chip">Por módulo</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="moduleDistributionChart"></canvas>
+            </div>
+          </div>
+          <div class="panel analytics-panel">
+            <div class="panel-header">
+              <h3>Estado de Tareas</h3>
+              <span class="info-chip">Prioridades</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="taskStatusChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-row two-column">
+          <div class="panel analytics-panel">
+            <div class="panel-header">
+              <h3>Actividad Reciente</h3>
+              <span class="info-chip">Últimos 5 registros</span>
+            </div>
+            <div id="recentActivity" class="activity-list"></div>
+          </div>
+          <div class="panel analytics-panel">
+            <div class="panel-header">
+              <h3>Alertas de Gestión</h3>
+              <span class="info-chip">Prioridades pendientes</span>
+            </div>
+            <div id="priorityList" class="priority-list"></div>
+          </div>
+        </div>
+
+        <div class="dashboard-row">
+          <div class="panel analytics-panel backup-panel">
+            <div class="panel-header">
+              <h3>Control de Respaldo</h3>
+              <span id="backupStatus" class="status-pill">Sin programar</span>
+            </div>
+            <form id="backupForm" class="backup-form">
+              <div class="field">
+                <label for="backupFrequency">Frecuencia</label>
+                <select id="backupFrequency" name="backupFrequency">
+                  <option value="off">No programado</option>
+                  <option value="demo30">Cada 30 segundos (demo)</option>
+                  <option value="daily">Diario</option>
+                  <option value="weekly">Semanal</option>
+                </select>
+              </div>
+              <div class="actions compact-actions">
+                <button id="saveBackupConfig" class="primary" type="submit">Programar</button>
+                <button id="runBackupNow" class="secondary" type="button">Generar ahora</button>
+                <button id="downloadBackup" class="secondary" type="button">Descargar</button>
+              </div>
+            </form>
+            <div class="backup-grid">
+              <article class="backup-stat">
+                <span class="stat-label">Próxima ejecución</span>
+                <strong id="backupNextRun">No definida</strong>
+              </article>
+              <article class="backup-stat">
+                <span class="stat-label">Última ejecución</span>
+                <strong id="backupLastRun">Aún no ejecutado</strong>
+              </article>
+            </div>
+            <div id="backupHistory" class="backup-history"></div>
+          </strong>
+            </article>
+          </div>
+          <div id="backupHistory" class="backup-history"></div>
+        </div>
+      </section>
+
+      <section id="moduleSection" class="module-section hidden-section">
+        <div class="panel">
+          <h2 id="moduleTitle">Modulo</h2>
+          <p id="moduleDescription"></p>
+          <div class="stats-grid">
+            <article class="stat-card accent-card">
+              <span class="stat-label">Registros</span>
+              <strong id="statTotal">0</strong>
+            </article>
+            <article class="stat-card">
+              <span class="stat-label">Ultima actualizacion</span>
+              <strong id="statLast">-</strong>
+            </article>
+            <article class="stat-card">
+              <span class="stat-label">Modulos activos</span>
+              <strong id="statModules">0</strong>
+            </article>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Nuevo registro</h3>
+          <form id="recordForm" class="form-grid"></form>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Registros guardados</h3>
+            <button id="exportExcelButton" class="primary" type="button">Descargar informe Excel</button>
+          </div>
+          <div class="import-row">
+            <input id="importFile" type="file" accept=".json,.csv" />
+            <button id="importButton" class="secondary" type="button">Cargar archivo</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead id="tableHead"></thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="footer-bar">
+    <span>AportaPY Gestion de Aportes | +595 981 555 123</span>
+    <span>Desarrollado por SIRS Consulting</span>
+  </footer>
+
+  <section id="loginOverlay" class="login-overlay">
+    <div class="login-card">
+      <span class="eyebrow">SGI</span>
+      <h2>Acceso al sistema</h2>
+      <p>Ingresa con tu usuario y contraseña para abrir el dashboard inicial y los modulos operativos.</p>
+      <form id="loginForm" class="login-form">
+        <div class="field">
+          <label for="loginUser">Usuario</label>
+          <input id="loginUser" name="username" type="text" autocomplete="username" required />
+        </div>
+        <div class="field">
+          <label for="loginPass">Contraseña</label>
+          <input id="loginPass" name="password" type="password" autocomplete="current-password" required />
+        </div>
+        <button class="primary" type="submit">Ingresar</button>
+      </form>
+      <p id="loginMessage" class="login-message"></p>
+      <div class="access-list">
+        <h3>Accesos para presentacion</h3>
+        <ul>
+          <li><strong>admin.general</strong> / Admin2026!</li>
+          <li><strong>benefactor.rosa</strong> / Benef2026!</li>
+          <li><strong>persona.ana</strong> / Pers2026!</li>
+          <li><strong>captador.mario</strong> / Capt2026!</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <script src="chartComponents.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
